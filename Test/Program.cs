@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Diagnostics;
-using System.IO;
+using Macros.Autowire;
 
 namespace Test
 {
@@ -11,24 +7,39 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            List<TimeSpan> ls = new List<TimeSpan>();
-            Stopwatch sw = new Stopwatch();
-            DataTable dt = new DataTable();
-            using (SqlConnection connection = new SqlConnection("Data Source=192.168.147.30;Initial Catalog=FinancialAnalysisDb;User Id=#_R;Password=$++@#$N@V@666!@@#"))
-            {
-                SqlCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT * FROM [DIT].[Tbl02_CompanyBalanceSheetFormulaAmount] ";
-                sw.Start();
-                connection.Open();
-                dt.Load(cmd.ExecuteReader());
-                sw.Stop();
-                ls.Add(sw.Elapsed);
-                sw.Restart();
-            }
-            var data = Macros.Serializers.PortableTableContainerSerializer.SerializeToStringAsync(dt).Result;
-            System.IO.File.WriteAllText("D:\\sssssssss.dt", data);
-            var deserialized = Macros.Serializers.PortableTableContainerSerializer.DeserializeFromStringAsync(data, (column , value)=> column == "ComBS_ID" && (long?)value == 30).Result;
-            Console.WriteLine("Hello World!");
+            var test = new Consumer(1);
+            Console.WriteLine(test.TestInjection.Id);
+            test = new Consumer(2);
+            Console.WriteLine(test.TestInjection.Id);
+            test = new Consumer(1);
+            Console.WriteLine(test.TestInjection.Id);
+            test = new Consumer(2);
+            Console.WriteLine(test.TestInjection.Id);
+            Manualwire.BindRelative<Consumer>(()=> new Consumer(1));                      
         }
+    }
+    public class Consumer
+    {
+        [Autowired]
+        public TestInjection TestInjection { get; set; }
+        public Consumer(int i)
+        {
+            this.EnableAutowiring(new Scope(i));
+        
+        }
+        public Consumer() {}
+    }
+    [Bind(typeof(TestInjection), BindingMethod = BindingMethods.RELATIVE)]
+    public class TestInjection : ITestInjection
+    {
+        public int Id { get; }
+        public TestInjection()
+        {
+            Id = new Random().Next();
+        }
+    }
+    public interface ITestInjection
+    {
+        int Id { get; }
     }
 }

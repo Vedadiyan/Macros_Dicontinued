@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
       <ProjectReference Include="../Serializers/Serializers.csproj" />
+      <ProjectReference Include="../Autowire/Autowire.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
