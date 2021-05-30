@@ -25,7 +25,6 @@ namespace Test
         public Consumer(int i)
         {
             this.EnableAutowiring(new Scope(i));
-        
         }
         public Consumer() {}
     }
